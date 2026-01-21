@@ -33,7 +33,7 @@ const createAccount = async(req,res) => {
                 role : "user"
             })
         log.info("AUTH",`User ${username} ${email} has been created`)
-        return res.status(200).json({
+        res.status(200).json({
             username,
             email,
             avatarUrl
@@ -58,7 +58,14 @@ const login = async(req,res) => {
     const isMatch = await bcrypt.compare(password ,user.password);
     if(isMatch){
             const token = jwt.sign({username:user.username,email:user.email,userId : user._id},JWT_SECRET,{expiresIn:'1h'});
-            return res.json({token});
+            res.cookie("token",token,{
+                httpOnly : true,
+                secure : false,
+                sameSite : "lax",
+                maxAge: 60*60*1000
+            })
+            res.json({token});
+            return;
         }
         else{
             return res.status(401).json({error: 'Invalid credentials'});
@@ -66,7 +73,8 @@ const login = async(req,res) => {
 }
 
 const validateToken = (req,res) => {
-    const token = req.header('Authorization').replace('Bearer ','');
+    // const token = req.header('Authorization').replace('Bearer ','');
+    const token = req.cookies.token;
     log.info("AUTH","Token validation request");
     if(!token){
         log.error("AUTH","Token is invalid");
@@ -74,8 +82,9 @@ const validateToken = (req,res) => {
     }
     try{
             const decoded = jwt.verify(token , JWT_SECRET);
+            console.log(decoded)
             log.info("AUTH","Token validation is successfull");
-            res.json({user :{ username : decoded.username , id : decoded.id} });
+            res.json({user :{ username : decoded.username , email : decoded.email, userId : decoded.userId} });
     }catch{
         log.error("AUTH","Token is invalid");
         res.status(401).json({error : "Invalid token"});

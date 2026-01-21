@@ -6,15 +6,14 @@ const JWT_SECRET = process.env.JWT_SECRET;
 const protect  = (req,res,next) => {
 
     log.info("MIDDLEWARE","User validity check");
-    const token = req.header("Authorization").replace('Bearer ','');
-
+    // const token = req.header("Authorization").replace('Bearer ','');
+    const token = req.cookies.token;
     if(!token){
         log.error("MIDDLEWARE","Token not provided");
         return res.status(400).json({message: "token is not provided"});
     }
     try{
         const decoded = jwt.decode(token,JWT_SECRET);
-        console.log(decoded)
         log.info("MIDDLEWARE","Middleware check passed");
         req.user = decoded;
         next();

@@ -7,23 +7,31 @@ const { createPost } = require("./controllers/createPost");
 const { log } = require("./production-utilities/logger");
 const { protect } = require("./middleware/authMiddleware");
 const { getPosts } = require("./controllers/getPosts");
+const { ownerProtect } = require("./middleware/ownershipMiddleware");
+const { updatePost } = require("./controllers/updatePost");
+const { deletePost } = require("./controllers/deletePost");
+const cookieParser = require("cookie-parser");
 const app = express();
 
 app.use(cors({
-    origin:'*',
-    credentials :false
+    origin:'http://localhost:3000',
+    credentials :true
 }))
+
 app.get('/',(req,res)=> {
     res.send("hello from the server");
 })
+app.use(cookieParser());
 app.use(express.json());
 app.get("/api/validate",validateToken)
+app.get("/api/get-posts",protect,getPosts)
 
 app.post("/api/login",login);
-
 app.post("/api/create-account",createAccount)
-app.get("/api/get-posts",protect,getPosts)
+
 app.post("/api/create-post",protect,createPost)
+app.post("/api/update-post",protect,ownerProtect,updatePost)
+app.post("/api/delete-post",protect,ownerProtect,deletePost)
 const PORT = process.env.PORT || 8080;
 
 app.listen(PORT,()=>{
