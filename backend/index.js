@@ -22,7 +22,7 @@ app.get('/',(req,res)=> {
     res.send("hello from the server");
 })
 app.use(cookieParser());
-app.use(express.json());
+app.use(express.json({limit : "5mb"}));
 app.get("/api/validate",validateToken)
 app.get("/api/get-posts",protect,getPosts)
 

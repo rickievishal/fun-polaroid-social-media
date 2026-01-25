@@ -62,7 +62,7 @@ const login = async(req,res) => {
                 httpOnly : true,
                 secure : false,
                 sameSite : "lax",
-                maxAge: 60*60*1000
+                maxAge: 60*60*1000*100000
             })
             res.json({token});
             return;
@@ -84,7 +84,7 @@ const validateToken = (req,res) => {
             const decoded = jwt.verify(token , JWT_SECRET);
             console.log(decoded)
             log.info("AUTH","Token validation is successfull");
-            res.json({user :{ username : decoded.username , email : decoded.email, userId : decoded.userId} });
+            res.json({user :{ username : decoded.username , email : decoded.email} });
     }catch{
         log.error("AUTH","Token is invalid");
         res.status(401).json({error : "Invalid token"});
