@@ -11,10 +11,11 @@ const { ownerProtect } = require("./middleware/ownershipMiddleware");
 const { updatePost } = require("./controllers/updatePost");
 const { deletePost } = require("./controllers/deletePost");
 const cookieParser = require("cookie-parser");
+const { logout } = require("./controllers/logoutUser");
 const app = express();
 
 app.use(cors({
-    origin:'http://localhost:3000',
+    origin:'http://192.168.3.1:3000',
     credentials :true
 }))
 
@@ -28,6 +29,7 @@ app.get("/api/get-posts",protect,getPosts)
 
 app.post("/api/login",login);
 app.post("/api/create-account",createAccount)
+app.get("/api/logout",logout)
 
 app.post("/api/create-post",protect,createPost)
 app.post("/api/update-post",protect,ownerProtect,updatePost)
